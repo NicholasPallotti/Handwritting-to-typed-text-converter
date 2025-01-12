@@ -4,25 +4,22 @@ from torch.utils.data import DataLoader
 from torchvision import datasets
 from torchvision.transforms import ToTensor
 
-
-#Import
-
 #Import data
-training_data = datasets.FashionMNIST(
+training_data = datasets.MNIST(
     root="data",
     train=True,
     download=True,
     transform=ToTensor(),
 )
 
-test_data = datasets.FashionMNIST(
+test_data = datasets.MNIST(
     root="data",
     train=False,
     download=True,
     transform=ToTensor(),
 )
 
-#intialize NN model
+#select device
 device = (
     "cuda"
     if torch.cuda.is_available()
@@ -32,13 +29,12 @@ device = (
 )
 print(f"Using {device} device")
 
+#define NN
 class NeuralNetwork(nn.Module):
     def __init__(self):
         super().__init__()
-        self.flatten = nn.Flatten() #flaten transforms the multidimensional array into an 1d one becuase thats how layers need to be formatted
+        self.flatten = nn.Flatten() 
         self.linear_relu_stack = nn.Sequential(
-            #linear defines an input layer and an out put layer, ie a 28x28 matrix is being turned into a 512 node layer
-            #relu is needed as an activation function
             nn.Linear(28*28, 512),  
             nn.ReLU(),
             nn.Linear(512, 512),
@@ -52,6 +48,13 @@ class NeuralNetwork(nn.Module):
         return logits
 
 model = NeuralNetwork().to(device)
+
+try:
+  state_dict = torch.load('model.pt')
+  model.load_state_dict(state_dict)
+except:
+  print("No file found")
+
 print(model)
 
 #create data loaders
@@ -73,7 +76,7 @@ def train(dataloader, model, loss_fn, optimizer):
     size = len(dataloader.dataset)
     model.train()
     for batch, (X, y) in enumerate(dataloader):
-        #forward pass
+
         X, y = X.to(device), y.to(device)
 
         #calculate error by comparing expected vs actual
@@ -113,3 +116,5 @@ for t in range(epochs):
     train(train_dataloader, model, loss_fn, optimizer)
     test(test_dataloader, model, loss_fn)
 print("done!")
+
+torch.save(model.state_dict(), 'model.pt')

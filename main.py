@@ -18,18 +18,23 @@ def import_data():
     
     labels = []
     data = []
-    content = []
+
+    img = open('/data/image')
 
     with open('data/gt_test.txt', 'r') as file:
         for line in file:
-            test = line.strip().split(" ", 2)
-            data.append(test)   
 
-    print(data)
-    return data
+            label = line[0:14]
+            data_point = line[14:].strip()
+            
+            labels.append(label)
+            data.append(data_point)
+        
+        
+    return data, labels
 
 def main():
-    data = import_data()
+    data, labels = import_data()
    
 
 if __name__ == '__main__':

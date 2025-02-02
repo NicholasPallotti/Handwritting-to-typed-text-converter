@@ -3,17 +3,27 @@ from torch import nn
 from torch.utils.data import DataLoader
 from torchvision import datasets
 from torchvision.transforms import ToTensor
-import pandas as pd
+
+# #define NN
+class NeuralNetwork(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.flatten = nn.Flatten() 
+        self.linear_relu_stack = nn.Sequential(
+            nn.Linear(28*28, 512),  
+            nn.ReLU(),
+            nn.Linear(512, 512),
+            nn.ReLU(),
+            nn.Linear(512, 10)
+        )
+
+    def forward(self, x):
+        x=self.flatten(x)
+        logits=self.linear_relu_stack(x)
+        return logits
 
 
-#seperate columns of gt_test
-#add labels for image
-#Import data
-
-
-
-
-
+#import/format data
 def import_data():
     
     labels = []
@@ -35,38 +45,24 @@ def import_data():
 
 def main():
     data, labels = import_data()
+
+    # #select device
+    device = (
+     "cuda"
+     if torch.cuda.is_available()
+     else "mps"
+     if torch.backends.mps.is_available()
+     else "cpu"
+    )
+
+    print(f"Using {device} device")
    
 
 if __name__ == '__main__':
     main()
 
-# #select device
-# device = (
-#     "cuda"
-#     if torch.cuda.is_available()
-#     else "mps"
-#     if torch.backends.mps.is_available()
-#     else "cpu"
-# )
-# print(f"Using {device} device")
 
-# #define NN
-# class NeuralNetwork(nn.Module):
-#     def __init__(self):
-#         super().__init__()
-#         self.flatten = nn.Flatten() 
-#         self.linear_relu_stack = nn.Sequential(
-#             nn.Linear(28*28, 512),  
-#             nn.ReLU(),
-#             nn.Linear(512, 512),
-#             nn.ReLU(),
-#             nn.Linear(512, 10)
-#         )
 
-#     def forward(self, x):
-#         x=self.flatten(x)
-#         logits=self.linear_relu_stack(x)
-#         return logits
 
 # model = NeuralNetwork().to(device)
 
